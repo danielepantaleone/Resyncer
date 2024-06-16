@@ -1,0 +1,23 @@
+name: Swift Tests
+on:
+  push:
+    branches: [ "master" ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  tests:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: ['macOS', 'iOS']
+        swift: ["5.7", "5.8"]
+    runs-on: macos-latest
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v3
+      - name: Run Swiftlint
+        run: swiftlint
+      - name: Run swift tests
+        run: swift test
