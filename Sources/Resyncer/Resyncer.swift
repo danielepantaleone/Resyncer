@@ -112,6 +112,7 @@ public final class Resyncer: Sendable {
     ///
     /// - throws: `ResyncerError`
     /// - returns: `T`
+    @available(iOS 13.0, *)
     public func synchronize<T>(timeout: TimeInterval = 10.0, work: @escaping () async throws -> T) throws -> T {
         guard !raiseErrorIfOnMainThread || !Thread.isMainThread else {
             throw ResyncerError.calledFromMainThread
