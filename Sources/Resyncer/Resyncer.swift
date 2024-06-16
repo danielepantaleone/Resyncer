@@ -40,7 +40,7 @@ public final class Resyncer: Sendable {
     
     /// Synchronize the result of the provided asynchronous handler.
     ///
-    /// Result must be delivered inside the the `Result<T, Error>` enum as callback parameter.
+    /// Result must be delivered inside a `Result<T, Error>` enum as callback parameter.
     /// This method must not be called from the main thread since it uses a condition variable to block current thread execution to wait for asynchronous work to complete.
     ///
     /// ```
@@ -66,7 +66,7 @@ public final class Resyncer: Sendable {
             throw ResyncerError.calledFromMainThread
         }
         let condition = ResyncerCondition()
-        var result: Result<T, Error>? = nil
+        var result: Result<T, Error>?
         let operation: BlockOperation = .init {
             work {
                 defer {

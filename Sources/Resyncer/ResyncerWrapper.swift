@@ -12,5 +12,5 @@
 import Foundation
 
 class ResyncerWrapper<T> {
-    var result: Result<T, Error>? = nil
+    var result: Result<T, Error>?
 }
