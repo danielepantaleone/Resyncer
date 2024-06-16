@@ -50,7 +50,14 @@ class ResyncerTests: XCTestCase {
         XCTAssertEqual(x, 5)
     }
     
-    func testFailureWithInternalError() throws {
+    func testSuccessWithSwiftConcurrency() throws {
+        let x = try resyncer.synchronize {
+            try await self.asyncWork(after: 4.0, value: 5)
+        }
+        XCTAssertEqual(x, 5)
+    }
+    
+    func testFailureDueToInternalError() throws {
         do {
             let _: Int = try resyncer.synchronize { callback in
                 self.asyncWork(after: 4.0, error: TestError.randomError) { value, error in
@@ -69,7 +76,20 @@ class ResyncerTests: XCTestCase {
         }
     }
     
-    func testFailureWithTimeout() throws {
+    func testFailureDueToInternalErrorWithSwiftConcurrency() throws {
+        do {
+            let _: Int = try resyncer.synchronize {
+                try await self.asyncWork(after: 4.0, error: TestError.randomError)
+            }
+            XCTFail("was supposed to raise an error")
+        } catch let error as TestError {
+            XCTAssertEqual(error, TestError.randomError)
+        } catch {
+            XCTFail("was supposed to raise TestError.randomError")
+        }
+    }
+    
+    func testFailureDueToTimeout() throws {
         do {
             _ = try resyncer.synchronize(timeout: 2.0) { callback in
                 self.asyncWork(after: 4.0, value: 5) { value, error in
@@ -88,12 +108,35 @@ class ResyncerTests: XCTestCase {
         }
     }
     
+    func testFailureDueToTimeoutErrorWithSwiftConcurrency() throws {
+        do {
+            let _: Int = try resyncer.synchronize(timeout: 2.0) {
+                try await self.asyncWork(after: 4.0, value: 5)
+            }
+            XCTFail("was supposed to raise an error")
+        } catch let error as ResyncerError {
+            XCTAssertEqual(error, ResyncerError.timeout)
+        } catch {
+            XCTFail("was supposed to raise TestError.timeout")
+        }
+    }
+    
     // MARK: - Internals
     
     func asyncWork(after timeout: TimeInterval, value: Int? = nil, error: Error? = nil, callback: @escaping (Int?, Error?) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
             callback(value, error)
         }
+    }
+    
+    func asyncWork(after timeout: TimeInterval, value: Int? = nil, error: Error? = nil) async throws -> Int {
+        try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
+        if let error {
+            throw error
+        } else if let value {
+            return value
+        }
+        return -1
     }
     
 }

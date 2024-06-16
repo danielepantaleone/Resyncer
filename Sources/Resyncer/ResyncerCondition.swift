@@ -62,7 +62,7 @@ class ResyncerCondition {
         let utime = date.timeIntervalSince1970
         var expire = timespec()
         expire.tv_sec = __darwin_time_t(utime)
-        expire.tv_nsec = (Int(utime) - expire.tv_sec) * 1000000000
+        expire.tv_nsec = (Int(utime) - expire.tv_sec) * 1_000_000_000
         return pthread_cond_timedwait(&condition, &mutex, &expire) == 0
     }
     
