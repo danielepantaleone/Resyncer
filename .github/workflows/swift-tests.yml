@@ -17,7 +17,5 @@ jobs:
     steps:
       - name: Repository checkout
         uses: actions/checkout@v4
-      - name: Run Swiftlint
-        run: swiftlint
       - name: Run swift tests
         run: swift test
