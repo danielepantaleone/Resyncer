@@ -13,8 +13,8 @@ import Foundation
 
 /// Error thrown by the `Resyncer`
 public enum ResyncerError: Error {
-    /// Resync operation couldn't be completed within the specified amount of time.
-    case asyncOperationTimeout
     /// Resync operation was called from main thread.
     case calledFromMainThread
+    /// Resync operation couldn't be completed within the specified amount of time.
+    case timeout
 }

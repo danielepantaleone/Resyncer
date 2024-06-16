@@ -94,7 +94,7 @@ public final class Resyncer: Sendable {
                     throw error
             }
         } else {
-            throw ResyncerError.asyncOperationTimeout
+            throw ResyncerError.timeout
         }
     }
 

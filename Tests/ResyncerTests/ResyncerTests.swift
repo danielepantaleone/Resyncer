@@ -39,7 +39,7 @@ class ResyncerTests: XCTestCase {
     
     func testSuccess() throws {
         let x = try resyncer.synchronize { callback in
-            self.myAsyncFunction(after: 4.0, value: 5) { value, error in
+            self.asyncWork(after: 4.0, value: 5) { value, error in
                 if let value {
                     callback(.success(value))
                 } else if let error {
@@ -53,7 +53,7 @@ class ResyncerTests: XCTestCase {
     func testFailureWithInternalError() throws {
         do {
             let _: Int = try resyncer.synchronize { callback in
-                self.myAsyncFunction(after: 4.0, error: TestError.randomError) { value, error in
+                self.asyncWork(after: 4.0, error: TestError.randomError) { value, error in
                     if let value {
                         callback(.success(value))
                     } else if let error {
@@ -72,7 +72,7 @@ class ResyncerTests: XCTestCase {
     func testFailureWithTimeout() throws {
         do {
             _ = try resyncer.synchronize(timeout: 2.0) { callback in
-                self.myAsyncFunction(after: 4.0, value: 5) { value, error in
+                self.asyncWork(after: 4.0, value: 5) { value, error in
                     if let value {
                         callback(.success(value))
                     } else if let error {
@@ -82,7 +82,7 @@ class ResyncerTests: XCTestCase {
             }
             XCTFail("was supposed to raise an error")
         } catch let error as ResyncerError {
-            XCTAssertEqual(error, ResyncerError.asyncOperationTimeout)
+            XCTAssertEqual(error, ResyncerError.timeout)
         } catch {
             XCTFail("was supposed to raise ResyncerError.asyncOperationTimeout")
         }
@@ -90,7 +90,7 @@ class ResyncerTests: XCTestCase {
     
     // MARK: - Internals
     
-    func myAsyncFunction(after timeout: TimeInterval, value: Int? = nil, error: Error? = nil, callback: @escaping (Int?, Error?) -> Void) {
+    func asyncWork(after timeout: TimeInterval, value: Int? = nil, error: Error? = nil, callback: @escaping (Int?, Error?) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
             callback(value, error)
         }
