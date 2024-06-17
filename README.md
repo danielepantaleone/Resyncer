@@ -1,5 +1,7 @@
 # Resyncer
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdanielepantaleone%2FResyncer%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/danielepantaleone/Resyncer)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdanielepantaleone%2FResyncer%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/danielepantaleone/Resyncer)
 ![Cocoapods](https://img.shields.io/cocoapods/v/Resyncer?style=flat-square)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/danielepantaleone/Resyncer?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/danielepantaleone/Resyncer?style=flat-square)
