@@ -40,7 +40,7 @@ If you have an asynchronous function that posts a value on a provided callback u
 func asyncWork(_ completion: @escaping (Result<Int, Error>) -> Void) { ... }
 ```
 
-You can use Resyncher to obtain the produced value in a synchronouse environment:
+You can use Resyncher to obtain the produced value in a synchronous environment:
 
 ```swift
 let x = try resyncer.synchronize { callback in
@@ -58,7 +58,7 @@ If you have an asynchronous function that returns a value:
 func asyncWork() async throws -> Int { ... }
 ```
 
-You can use Resyncher to obtain the produced value in a synchronouse environment:
+You can use Resyncher to obtain the produced value in a synchronous environment:
 
 ```swift
 let x = try resyncer.synchronize { callback in
