@@ -61,7 +61,7 @@ func asyncWork() async throws -> Int { ... }
 You can use Resyncher to obtain the produced value in a synchronous environment:
 
 ```swift
-let x = try resyncer.synchronize { callback in
+let x = try resyncer.synchronize {
     try await self.asyncWork()
 }
 ```
