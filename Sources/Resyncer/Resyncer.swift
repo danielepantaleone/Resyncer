@@ -167,10 +167,10 @@ public final class Resyncer: Sendable {
         
         if let result = wrapper.result {
             switch result {
-            case .success(let value):
-                return value
-            case .failure(let error):
-                throw error
+                case .success(let value):
+                    return value
+                case .failure(let error):
+                    throw error
             }
         } else {
             throw ResyncerError.timeout
