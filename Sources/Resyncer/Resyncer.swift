@@ -11,7 +11,9 @@
 
 import Foundation
 
-/// `Resyncer` helps making use of asynchronous API in a synchronous environment.
+/// Resyncer enables you to call asynchronous code within a synchronous environment by pausing the current thread
+/// until the asynchronous task completes. It achieves this by offloading the asynchronous work to a separate thread,
+/// either using an `OperationQueue` or leveraging Swift concurrency with `Task`.
 public final class Resyncer: Sendable {
     
     // MARK: - Properties
@@ -21,15 +23,17 @@ public final class Resyncer: Sendable {
     
     // MARK: - Initialization
     
-    /// Initialize the `Resyncer`.
+    /// Initializes a new instance of the `Resyncer`.
     public convenience init() {
         self.init(raiseErrorIfOnMainThread: true)
     }
     
-    /// Initialize the `Resyncer`.
+    /// Initializes a new instance of the `Resyncer`.
     ///
-    /// - parameters:
-    ///   - raiseErrorIfOnMainThread: A boolean value to indicate whether an error must be thrown if `synchronize` is called from main thread
+    /// This initializer creates a `Resyncer` with a specified behavior regarding main thread usage.
+    ///
+    /// - Parameters:
+    ///   - raiseErrorIfOnMainThread: A Boolean value indicating whether an error should be thrown if `synchronize` is called from the main thread. The default value is `true`.
     init(raiseErrorIfOnMainThread: Bool = true) {
         self.queue = OperationQueue()
         self.queue.maxConcurrentOperationCount = 10
@@ -38,12 +42,17 @@ public final class Resyncer: Sendable {
     
     // MARK: - Interface
     
-    /// Synchronize the result of the provided asynchronous handler.
+    /// Synchronizes the result of the provided asynchronous handler.
     ///
-    /// Result must be delivered inside a `Result<T, Error>` enum as callback parameter.
-    /// This method must not be called from the main thread since it uses a condition variable to block current thread execution to wait for asynchronous work to complete.
+    /// This method synchronously waits for the completion of an asynchronous task.
+    /// The result of the task must be delivered using a `Result<T, Error>` enum as a callback parameter.
     ///
-    /// ```
+    /// **Important:** This method must not be called from the main thread, as it uses a condition variable to block
+    /// the current thread's execution while waiting for the asynchronous work to complete.
+    ///
+    /// Example usage:
+    ///
+    /// ```swift
     /// let x = try resyncer.synchronize { callback in
     ///     self.asyncWork { value, error in
     ///         if let value {
@@ -55,16 +64,19 @@ public final class Resyncer: Sendable {
     /// }
     /// ```
     ///
-    /// - parameters:
-    ///   - timeout: The maximum amount of seconds the asynchronous work may take
-    ///   - work: The asynchronous operation to synchronize
+    /// - Parameters:
+    ///   - timeout: The maximum time in seconds the asynchronous task is allowed to take. The default value is 10.0 seconds.
+    ///   - work: The asynchronous operation to be synchronized. It takes a completion handler with a `Result<T, Error>` parameter.
     ///
-    /// - throws: `ResyncerError`
-    /// - returns: `T`
+    /// - Throws: `ResyncerError` if the operation fails, including cases such as being called on the main thread or a timeout.
+    ///
+    /// - Returns: The result of type `T` from the asynchronous operation if it completes successfully.
     public func synchronize<T>(timeout: TimeInterval = 10.0, work: @escaping (@escaping (Result<T, Error>) -> Void) -> Void) throws -> T {
+        
         guard !raiseErrorIfOnMainThread || !Thread.isMainThread else {
             throw ResyncerError.calledFromMainThread
         }
+        
         let condition = ResyncerCondition()
         var result: Result<T, Error>?
         let operation: BlockOperation = .init {
@@ -77,13 +89,17 @@ public final class Resyncer: Sendable {
                 result = $0
             }
         }
+        
         queue.addOperation(operation)
+        
         condition.lock()
         defer {
             condition.unlock()
         }
+        
         condition.wait(timeout: timeout)
         operation.cancel()
+        
         if let result {
             switch result {
                 case .success(let value):
@@ -94,31 +110,41 @@ public final class Resyncer: Sendable {
         } else {
             throw ResyncerError.timeout
         }
+        
     }
         
-    /// Synchronize the result of the provided asynchronous handler.
+    /// Synchronizes the result of the provided asynchronous handler.
     ///
-    /// This method must not be called from the main thread since it uses a condition variable to block current thread execution to wait for asynchronous work to complete.
+    /// This method synchronously waits for the completion of an asynchronous task that uses Swift's async/await pattern.
     ///
-    /// ```
+    /// **Important:** This method must not be called from the main thread, as it utilizes a condition variable
+    /// to block the current thread's execution while waiting for the asynchronous operation to finish.
+    ///
+    /// Example usage:
+    ///
+    /// ```swift
     /// let x = try resyncer.synchronize {
     ///     try await self.asyncWork()
     /// }
     /// ```
     ///
-    /// - parameters:
-    ///   - timeout: The maximum amount of seconds the asynchronous work may take
-    ///   - work: The asynchronous operation to synchronize
+    /// - Parameters:
+    ///   - timeout: The maximum time in seconds the asynchronous operation can take. The default is 10.0 seconds.
+    ///   - work: The asynchronous operation to synchronize, which uses Swift's async/await and can throw errors.
     ///
-    /// - throws: `ResyncerError`
-    /// - returns: `T`
+    /// - Throws: `ResyncerError` if the operation encounters an error, including calling from the main thread or exceeding the timeout.
+    ///
+    /// - Returns: The result of type `T` from the asynchronous operation if it completes successfully.
     @available(iOS 13.0, *)
     public func synchronize<T>(timeout: TimeInterval = 10.0, work: @escaping () async throws -> T) throws -> T {
+        
         guard !raiseErrorIfOnMainThread || !Thread.isMainThread else {
             throw ResyncerError.calledFromMainThread
         }
+        
         let condition = ResyncerCondition()
         let wrapper: ResyncerWrapper<T> = .init()
+        
         Task {
             defer {
                 condition.lock()
@@ -131,21 +157,25 @@ public final class Resyncer: Sendable {
                 wrapper.result = .failure(error)
             }
         }
+        
         condition.lock()
         defer {
             condition.unlock()
         }
+        
         condition.wait(timeout: timeout)
+        
         if let result = wrapper.result {
             switch result {
-                case .success(let value):
-                    return value
-                case .failure(let error):
-                    throw error
+            case .success(let value):
+                return value
+            case .failure(let error):
+                throw error
             }
         } else {
             throw ResyncerError.timeout
         }
+        
     }
 
 }

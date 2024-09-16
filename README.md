@@ -7,7 +7,11 @@
 ![GitHub](https://img.shields.io/github/license/danielepantaleone/Resyncer?style=flat-square)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/danielepantaleone/Resyncer/swift-tests.yml?style=flat-square&logo=github)](https://github.com/danielepantaleone/Resyncer/actions/workflows/swift-tests.yml)
 
-A swift library to make use of asynchronous API in a synchronous environment.
+Resyncer is a Swift library designed to seamlessly integrate asynchronous APIs within synchronous environments. 
+It allows developers to call asynchronous code—whether using callbacks or Swift’s async/await pattern—and block 
+the calling thread until the asynchronous task is complete. This ensures that a result is available before proceeding 
+with the synchronous workflow, making it ideal for scenarios where sequential execution is critical, but asynchronous 
+tasks are involved.
 
 ## Table of contents
 
@@ -28,7 +32,10 @@ A swift library to make use of asynchronous API in a synchronous environment.
 
 ## Basic usage
 
-Resyncer help you calling asynchronous code in a synchronous environment by suspending current thread execution, waiting for asynchronous work to complete. This is done by offloading asynchronous work to a different thread either by using an [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) or by making use of swift-concurrency [Task](https://developer.apple.com/documentation/swift/task).
+Resyncer enables you to call asynchronous code within a synchronous environment by pausing the current thread 
+until the asynchronous task completes. It achieves this by offloading the asynchronous work to a separate thread, 
+either using an [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) or leveraging 
+Swift concurrency with [Task](https://developer.apple.com/documentation/swift/task).
 
 **Because Resyncer is going to block the calling thread, make sure not to use it from the Main Thread.**
 
@@ -73,7 +80,7 @@ let x = try resyncer.synchronize {
 Add the dependency to the `Resyncer` framework in your `Podfile`:
 
 ```ruby
-pod 'Resyncer', '~> 1.0.0'
+pod 'Resyncer', '~> 1.1.0'
 ```
 
 ### Swift Package Manager
@@ -82,7 +89,7 @@ Add it as a dependency in a Swift Package:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/danielepantaleone/Resyncer.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/danielepantaleone/Resyncer.git", .upToNextMajor(from: "1.1.0"))
 ]
 ```
 
