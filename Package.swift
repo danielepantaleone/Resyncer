@@ -10,21 +10,24 @@ let package = Package(
         .macOS(.v12)
     ],
     products: [
-        .library(
-            name: "Resyncer",
-            targets: [
-                "Resyncer"
-            ])
+        .library(name: "Resyncer", targets: ["Resyncer"])
+    ],
+    dependencies: [
+        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.57.0")
     ],
     targets: [
         .target(
             name: "Resyncer",
-            dependencies: []
+            dependencies: [],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint")
+            ]
          ),
         .testTarget(
             name: "ResyncerTests",
             dependencies: [
                 "Resyncer"
-            ])
+            ]
+        )
     ]
 )
