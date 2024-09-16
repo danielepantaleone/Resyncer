@@ -12,15 +12,19 @@ let package = Package(
     products: [
         .library(
             name: "Resyncer",
-            targets: ["Resyncer"])
+            targets: [
+                "Resyncer"
+            ])
     ],
     targets: [
         .target(
             name: "Resyncer",
-            dependencies: [],
-            resources: [.copy("PrivacyInfo.xcprivacy")]),
+            dependencies: []
+         ),
         .testTarget(
             name: "ResyncerTests",
-            dependencies: ["Resyncer"])
+            dependencies: [
+                "Resyncer"
+            ])
     ]
 )
