@@ -11,7 +11,6 @@
 
 import Foundation
 
-/// Condition implementation which make use of low level `pthread_mutex_t`
 class ResyncerCondition {
     
     // MARK: - Properties
@@ -21,7 +20,6 @@ class ResyncerCondition {
     
     // MARK: - Initialization
     
-    /// Initialize the condition.
     init() {
         var m_attr = pthread_mutexattr_t()
         pthread_mutexattr_init(&m_attr)
@@ -38,7 +36,7 @@ class ResyncerCondition {
         pthread_mutex_destroy(&mutex)
     }
     
-    // MARK: - Interface
+    // MARK: - Functions
     
     @inline(__always)
     func lock() {
