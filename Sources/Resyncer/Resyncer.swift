@@ -11,7 +11,7 @@
 
 import Foundation
 
-/// `Resyncer` helps making use of asynchronous APIs in a synchronous environment.
+/// `Resyncer` helps making use of asynchronous API in a synchronous environment.
 public final class Resyncer: Sendable {
     
     // MARK: - Properties
@@ -56,7 +56,7 @@ public final class Resyncer: Sendable {
     /// ```
     ///
     /// - parameters:
-    ///   - timeout: The maximum amount of seconds the asynchronous may take
+    ///   - timeout: The maximum amount of seconds the asynchronous work may take
     ///   - work: The asynchronous operation to synchronize
     ///
     /// - throws: `ResyncerError`
@@ -107,7 +107,7 @@ public final class Resyncer: Sendable {
     /// ```
     ///
     /// - parameters:
-    ///   - timeout: The maximum amount of seconds the asynchronous may take
+    ///   - timeout: The maximum amount of seconds the asynchronous work may take
     ///   - work: The asynchronous operation to synchronize
     ///
     /// - throws: `ResyncerError`
