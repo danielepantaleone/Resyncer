@@ -41,12 +41,12 @@ class ResyncerCondition {
     // MARK: - Interface
     
     @inline(__always)
-    public func lock() {
+    func lock() {
         pthread_mutex_lock(&mutex)
     }
     
     @inline(__always)
-    public func unlock() {
+    func unlock() {
         pthread_mutex_unlock(&mutex)
     }
     
