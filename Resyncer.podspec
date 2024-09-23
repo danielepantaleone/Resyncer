@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version                     = "1.1.0"
   s.summary                     = "Resyncer is a Swift library designed to seamlessly integrate asynchronous APIs within synchronous environments"
   s.license                     = { :type => "MIT", :file => "LICENSE" }
-  s.homepage                    = "https://github.com/danielepantaleone/PersistedProperty"
+  s.homepage                    = "https://github.com/danielepantaleone/Resyncer"
   s.authors                     = { "Daniele Pantaleone" => "danielepantaleone@me.com" }
   s.ios.deployment_target       = "12.0"
   s.osx.deployment_target       = "12.0"
