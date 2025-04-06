@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                        = "Resyncer"
-  s.version                     = "1.1.0"
+  s.version                     = "1.2.0"
   s.summary                     = "Resyncer is a Swift library designed to seamlessly integrate asynchronous APIs within synchronous environments"
   s.license                     = { :type => "MIT", :file => "LICENSE" }
   s.homepage                    = "https://github.com/danielepantaleone/Resyncer"

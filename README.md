@@ -80,7 +80,7 @@ let x = try resyncer.synchronize {
 Add the dependency to the `Resyncer` framework in your `Podfile`:
 
 ```ruby
-pod 'Resyncer', '~> 1.1.0'
+pod 'Resyncer', '~> 1.2.0'
 ```
 
 ### Swift Package Manager
@@ -89,7 +89,7 @@ Add it as a dependency in a Swift Package:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/danielepantaleone/Resyncer.git", .upToNextMajor(from: "1.1.0"))
+    .package(url: "https://github.com/danielepantaleone/Resyncer.git", .upToNextMajor(from: "1.2.0"))
 ]
 ```
 

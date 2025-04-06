@@ -13,7 +13,7 @@ let package = Package(
         .library(name: "Resyncer", targets: ["Resyncer"])
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.57.0")
+        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.58.2")
     ],
     targets: [
         .target(
