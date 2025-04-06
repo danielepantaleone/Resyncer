@@ -13,7 +13,7 @@
 
 import XCTest
 
-class ResyncerTests: XCTestCase {
+final class ResyncerTests: XCTestCase {
     
     // MARK: - Types
     
@@ -21,25 +21,12 @@ class ResyncerTests: XCTestCase {
         case randomError
     }
     
-    // MARK: - Properties
-    
-    var resyncer: Resyncer!
-    
-    // MARK: - Initialization
-
-    override func setUpWithError() throws {
-        resyncer = Resyncer(raiseErrorIfOnMainThread: false)
-    }
-    
-    override func tearDownWithError() throws {
-        resyncer = nil
-    }
-    
     // MARK: - Tests
     
     func testSuccess() throws {
+        let resyncer = Resyncer()
         let x = try resyncer.synchronize { callback in
-            self.asyncWork(after: 4.0, value: 5) { value, error in
+            self.asyncWork(after: 2.0, value: 5) { value, error in
                 if let value {
                     callback(.success(value))
                 } else if let error {
@@ -50,38 +37,44 @@ class ResyncerTests: XCTestCase {
         XCTAssertEqual(x, 5)
     }
     
-    @available(iOS 13.0, *)
-    func testSuccessWithSwiftConcurrency() throws {
-        let x = try resyncer.synchronize {
-            try await self.asyncWork(after: 4.0, value: 5)
+    func testSuccessWithHeavyLoad() throws {
+        let numberOfOperations = 50
+        let resyncer = Resyncer(maxConcurrentOperationCount: numberOfOperations)
+        let expectation = expectation(description: "waiting for all tasks to complete")
+        expectation.expectedFulfillmentCount = numberOfOperations
+        for i in 0..<numberOfOperations {
+            DispatchQueue.global().async {
+                do {
+                    let x = try resyncer.synchronize { callback in
+                        self.asyncWork(after: 1.0, value: i) { value, error in
+                            if let value {
+                                callback(.success(value))
+                            } else if let error {
+                                callback(.failure(error))
+                            }
+                        }
+                    }
+                    XCTAssertEqual(x, i)
+                    expectation.fulfill()
+                } catch {
+                    XCTFail("Failed with unexpected error: \(error)")
+                }
+            }
         }
-        XCTAssertEqual(x, 5)
+        wait(for: [expectation], timeout: 50.0)
     }
     
     func testFailureDueToInternalError() throws {
+        let resyncer = Resyncer()
         do {
             let _: Int = try resyncer.synchronize { callback in
-                self.asyncWork(after: 4.0, error: TestError.randomError) { value, error in
+                self.asyncWork(after: 2.0, error: TestError.randomError) { value, error in
                     if let value {
                         callback(.success(value))
                     } else if let error {
                         callback(.failure(error))
                     }
                 }
-            }
-            XCTFail("was supposed to raise an error")
-        } catch let error as TestError {
-            XCTAssertEqual(error, TestError.randomError)
-        } catch {
-            XCTFail("was supposed to raise TestError.randomError")
-        }
-    }
-    
-    @available(iOS 13.0, *)
-    func testFailureDueToInternalErrorWithSwiftConcurrency() throws {
-        do {
-            let _: Int = try resyncer.synchronize {
-                try await self.asyncWork(after: 4.0, error: TestError.randomError)
             }
             XCTFail("was supposed to raise an error")
         } catch let error as TestError {
@@ -93,8 +86,9 @@ class ResyncerTests: XCTestCase {
     
     func testFailureDueToTimeout() throws {
         do {
-            _ = try resyncer.synchronize(timeout: 2.0) { callback in
-                self.asyncWork(after: 4.0, value: 5) { value, error in
+            let resyncer = Resyncer()
+            _ = try resyncer.synchronize(timeout: 1.0) { callback in
+                self.asyncWork(after: 2.0, value: 5) { value, error in
                     if let value {
                         callback(.success(value))
                     } else if let error {
@@ -106,21 +100,81 @@ class ResyncerTests: XCTestCase {
         } catch let error as ResyncerError {
             XCTAssertEqual(error, ResyncerError.timeout)
         } catch {
-            XCTFail("was supposed to raise ResyncerError.asyncOperationTimeout")
+            XCTFail("was supposed to raise ResyncerError.timeout")
+        }
+    }
+    
+    func testFailureDueToCallOnMainThread() throws {
+        do {
+            let resyncer = Resyncer(raiseErrorIfOnMainThread: true)
+            _ = try resyncer.synchronize(timeout: 1.0) { callback in
+                self.asyncWork(after: 2.0, value: 5) { value, error in
+                    if let value {
+                        callback(.success(value))
+                    } else if let error {
+                        callback(.failure(error))
+                    }
+                }
+            }
+            XCTFail("was supposed to raise an error")
+        } catch let error as ResyncerError {
+            XCTAssertEqual(error, ResyncerError.calledFromMainThread)
+        } catch {
+            XCTFail("was supposed to raise ResyncerError.calledFromMainThread")
+        }
+    }
+    
+    @available(iOS 13.0, *)
+    func testSuccessWithSwiftConcurrency() throws {
+        let resyncer = Resyncer()
+        let x = try resyncer.synchronize {
+            try await self.asyncWork(after: 2.0, value: 5)
+        }
+        XCTAssertEqual(x, 5)
+    }
+    
+    @available(iOS 13.0, *)
+    func testFailureDueToInternalErrorWithSwiftConcurrency() throws {
+        do {
+            let resyncer = Resyncer()
+            let _: Int = try resyncer.synchronize {
+                try await self.asyncWork(after: 2.0, error: TestError.randomError)
+            }
+            XCTFail("was supposed to raise an error")
+        } catch let error as TestError {
+            XCTAssertEqual(error, TestError.randomError)
+        } catch {
+            XCTFail("was supposed to raise TestError.randomError")
         }
     }
     
     @available(iOS 13.0, *)
     func testFailureDueToTimeoutErrorWithSwiftConcurrency() throws {
         do {
-            let _: Int = try resyncer.synchronize(timeout: 2.0) {
-                try await self.asyncWork(after: 4.0, value: 5)
+            let resyncer = Resyncer()
+            let _: Int = try resyncer.synchronize(timeout: 1.0) {
+                try await self.asyncWork(after: 2.0, value: 5)
             }
             XCTFail("was supposed to raise an error")
         } catch let error as ResyncerError {
             XCTAssertEqual(error, ResyncerError.timeout)
         } catch {
-            XCTFail("was supposed to raise TestError.timeout")
+            XCTFail("was supposed to raise ResyncerError.timeout")
+        }
+    }
+    
+    @available(iOS 13.0, *)
+    func testFailureDueToCallOnMainThreadWithSwiftConcurrency() throws {
+        do {
+            let resyncer = Resyncer(raiseErrorIfOnMainThread: true)
+            let _: Int = try resyncer.synchronize(timeout: 1.0) {
+                try await self.asyncWork(after: 2.0, value: 5)
+            }
+            XCTFail("was supposed to raise an error")
+        } catch let error as ResyncerError {
+            XCTAssertEqual(error, ResyncerError.calledFromMainThread)
+        } catch {
+            XCTFail("was supposed to raise ResyncerError.calledFromMainThread")
         }
     }
     
