@@ -28,5 +28,6 @@
 import Foundation
 
 final class ResyncerBox<T> {
+    var completed = false
     var result: Result<T, Error>?
 }
