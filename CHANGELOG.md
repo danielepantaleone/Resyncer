@@ -1,6 +1,6 @@
 # Resyncer - Release Notes
 
-## [1.2.0] - 2025-06-06
+## [1.2.0] - 2025-06-07
 - Improved asynchronous operation handling and leverage built-in NSCondition 
 
 ## [1.1.0] - 2024-09-16
