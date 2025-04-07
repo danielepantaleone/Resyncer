@@ -40,7 +40,7 @@ final class ResyncerTests: XCTestCase {
     // MARK: - Tests
     
     func testSuccess() throws {
-        let resyncer = Resyncer()
+        let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
         let x = try resyncer.synchronize { callback in
             self.asyncWork(after: 2.0, value: 5) { value, error in
                 if let value {
@@ -55,7 +55,7 @@ final class ResyncerTests: XCTestCase {
     
     func testSuccessWithHeavyLoad() throws {
         let numberOfOperations = 50
-        let resyncer = Resyncer(maxConcurrentOperationCount: numberOfOperations)
+        let resyncer = Resyncer(maxConcurrentOperationCount: numberOfOperations, raiseErrorIfOnMainThread: false)
         let expectation = expectation(description: "waiting for all tasks to complete")
         expectation.expectedFulfillmentCount = numberOfOperations
         for i in 0..<numberOfOperations {
@@ -81,7 +81,7 @@ final class ResyncerTests: XCTestCase {
     }
     
     func testFailureDueToInternalError() throws {
-        let resyncer = Resyncer()
+        let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
         do {
             let _: Int = try resyncer.synchronize { callback in
                 self.asyncWork(after: 2.0, error: TestError.randomError) { value, error in
@@ -102,7 +102,7 @@ final class ResyncerTests: XCTestCase {
     
     func testFailureDueToTimeout() throws {
         do {
-            let resyncer = Resyncer()
+            let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
             _ = try resyncer.synchronize(timeout: 1.0) { callback in
                 self.asyncWork(after: 2.0, value: 5) { value, error in
                     if let value {
@@ -142,7 +142,7 @@ final class ResyncerTests: XCTestCase {
     
     @available(iOS 13.0, *)
     func testSuccessWithSwiftConcurrency() throws {
-        let resyncer = Resyncer()
+        let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
         let x = try resyncer.synchronize {
             try await self.asyncWork(after: 2.0, value: 5)
         }
@@ -152,7 +152,7 @@ final class ResyncerTests: XCTestCase {
     @available(iOS 13.0, *)
     func testFailureDueToInternalErrorWithSwiftConcurrency() throws {
         do {
-            let resyncer = Resyncer()
+            let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
             let _: Int = try resyncer.synchronize {
                 try await self.asyncWork(after: 2.0, error: TestError.randomError)
             }
@@ -167,7 +167,7 @@ final class ResyncerTests: XCTestCase {
     @available(iOS 13.0, *)
     func testFailureDueToTimeoutErrorWithSwiftConcurrency() throws {
         do {
-            let resyncer = Resyncer()
+            let resyncer = Resyncer(raiseErrorIfOnMainThread: false)
             let _: Int = try resyncer.synchronize(timeout: 1.0) {
                 try await self.asyncWork(after: 2.0, value: 5)
             }
