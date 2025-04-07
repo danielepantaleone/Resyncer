@@ -168,7 +168,7 @@ public final class Resyncer {
         
         let condition = NSCondition()
         var completed = false
-        var result: Result<T, Error>?
+        let box: ResyncerBox<T> = .init()
         
         Task {
             let r: Result<T, Error>
@@ -179,7 +179,7 @@ public final class Resyncer {
             }
             condition.withLock {
                 completed = true
-                result = r
+                box.result = r
                 condition.signal()
             }
         }
@@ -193,7 +193,7 @@ public final class Resyncer {
             }
         }
 
-        guard let result, completed else {
+        guard let result = box.result, completed else {
             throw ResyncerError.timeout
         }
         
