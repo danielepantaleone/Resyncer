@@ -1,4 +1,4 @@
-# Resyncer
+![](https://github.com/danielepantaleone/Resyncer/blob/master/Banner.png?raw=true)
 
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdanielepantaleone%2FResyncer%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/danielepantaleone/Resyncer)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdanielepantaleone%2FResyncer%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/danielepantaleone/Resyncer)
@@ -7,11 +7,7 @@
 ![GitHub](https://img.shields.io/github/license/danielepantaleone/Resyncer?style=flat-square)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/danielepantaleone/Resyncer/swift-tests.yml?style=flat-square&logo=github)](https://github.com/danielepantaleone/Resyncer/actions/workflows/swift-tests.yml)
 
-Resyncer is a Swift library designed to seamlessly integrate asynchronous APIs within synchronous environments. 
-It allows developers to call asynchronous code—whether using callbacks or Swift’s async/await pattern—and block 
-the calling thread until the asynchronous task is complete. This ensures that a result is available before proceeding 
-with the synchronous workflow, making it ideal for scenarios where sequential execution is critical, but asynchronous 
-tasks are involved.
+Resyncer is a Swift library designed to seamlessly integrate asynchronous APIs within synchronous environments. It allows developers to call asynchronous code—whether using callbacks or Swift’s async/await pattern—and block the calling thread until the asynchronous task is complete. This ensures that a result is available before proceeding with the synchronous workflow, making it ideal for scenarios where sequential execution is critical, but asynchronous tasks are involved.
 
 ## Table of contents
 
@@ -32,10 +28,7 @@ tasks are involved.
 
 ## Basic usage
 
-Resyncer enables you to call asynchronous code within a synchronous environment by pausing the current thread 
-until the asynchronous task completes. It achieves this by offloading the asynchronous work to a separate thread, 
-either using an [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) or leveraging 
-Swift concurrency with [Task](https://developer.apple.com/documentation/swift/task).
+Resyncer enables you to call asynchronous code within a synchronous environment by pausing the current thread until the asynchronous task completes. It achieves this by offloading the asynchronous work to a separate thread, either using an [OperationQueue](https://developer.apple.com/documentation/foundation/operationqueue) or leveraging Swift concurrency with [Task](https://developer.apple.com/documentation/swift/task).
 
 **Because Resyncer is going to block the calling thread, make sure not to use it from the Main Thread.**
 
@@ -47,7 +40,7 @@ If you have an asynchronous function that posts a value on a provided callback u
 func asyncWork(_ completion: @escaping (Result<Int, Error>) -> Void) { ... }
 ```
 
-You can use Resyncher to obtain the produced value in a synchronous environment:
+You can use Resyncer to obtain the produced value in a synchronous environment:
 
 ```swift
 let x = try resyncer.synchronize { callback in
@@ -65,7 +58,7 @@ If you have an asynchronous function that returns a value:
 func asyncWork() async throws -> Int { ... }
 ```
 
-You can use Resyncher to obtain the produced value in a synchronous environment:
+You can use Resyncer to obtain the produced value in a synchronous environment:
 
 ```swift
 let x = try resyncer.synchronize {
@@ -105,7 +98,7 @@ If you like this project you can contribute it by:
 ```
 MIT License
 
-Copyright (c) 2024 Daniele Pantaleone
+Copyright (c) 2025 Daniele Pantaleone
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
