@@ -12,16 +12,10 @@ let package = Package(
     products: [
         .library(name: "Resyncer", targets: ["Resyncer"])
     ],
-    dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.58.2")
-    ],
     targets: [
         .target(
             name: "Resyncer",
-            dependencies: [],
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint")
-            ]
+            dependencies: []
          ),
         .testTarget(
             name: "ResyncerTests",
