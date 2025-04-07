@@ -9,5 +9,5 @@ Pod::Spec.new do |s|
   s.osx.deployment_target       = "12.0"
   s.source                      = { :git => "https://github.com/danielepantaleone/Resyncer.git", :tag => "#{s.version}" }
   s.source_files                = "Sources/Resyncer/**/*.swift"
-  s.swift_version               = "5.7"
+  s.swift_version               = "5.9"
 end
